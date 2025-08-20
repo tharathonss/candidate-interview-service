@@ -1,6 +1,6 @@
 Candidate Interview Service
 
-Run with Docker Compose
+Run with Docker Compose:
 docker compose up -d --build
 
 API: http://localhost:3000
