@@ -1,0 +1,46 @@
+services:
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: candidate
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  mongo:
+    image: mongo:7
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: root
+    ports: [ "27017:27017" ]
+    volumes:
+      - mongodata:/data/db
+
+  api:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      PORT: 3000
+      HOST: 0.0.0.0
+      JWT_SECRET: supersecret123
+      JWT_EXPIRES: 15m
+      REFRESH_DAYS: 7
+      RATE_LIMIT_AUTH_WINDOW_MS: 60000
+      RATE_LIMIT_AUTH_MAX: 100
+      RATE_LIMIT_GENERAL_WINDOW_MS: 60000
+      RATE_LIMIT_GENERAL_MAX: 300
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/candidate
+      MONGO_URL: mongodb://root:root@mongo:27017/candidate_interview_mongo?authSource=admin
+      SEED: "true"
+    depends_on:
+      - postgres
+      - mongo
+
+volumes:
+  pgdata:
+  mongodata:
